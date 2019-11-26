@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 
-[ExecuteAlways]
+[ExecuteInEditMode]
 public class TextureGenerator : MonoBehaviour
 {
     /*[Header("Texture Sheet")]
@@ -35,8 +35,8 @@ public class TextureGenerator : MonoBehaviour
             mainMat = new Material(mainShader);
         }
         //container position and localScale to determine its furthest/nearest point in each direction (x,y,z)
-        mainMat.SetVector("_ContainerMaxBounds", container.position + (container.localScale/2));
-        mainMat.SetVector("_ContainerMinBounds", container.position - (container.localScale/2));
+        mainMat.SetVector("_ContainerMaxBounds", container.position + container.localScale/2);
+        mainMat.SetVector("_ContainerMinBounds", container.position - container.localScale/2);
         Graphics.Blit(source, destination, mainMat);
     }
 }
