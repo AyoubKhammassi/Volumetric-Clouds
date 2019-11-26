@@ -26,6 +26,7 @@ public class TextureGenerator : MonoBehaviour
     void Start()
     {
         mainMat = new Material(mainShader);
+        Camera.main.depthTextureMode = DepthTextureMode.Depth;
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)

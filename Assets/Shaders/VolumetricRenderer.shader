@@ -64,7 +64,8 @@
 			bool AABBRayIntersection(in ray r, in float3 cminb, in float3 cmaxb, out float dtobox, out float dinbox)
 			{
 				//https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
-				
+				dtobox = 0;
+				dinbox = 0;
 				float3 bounds[2];
 				bounds[0] = cminb;
 				bounds[1] = cmaxb;
@@ -116,20 +117,26 @@
             sampler2D _MainTex;
 			float3 _ContainerMaxBounds;
 			float3 _ContainerMinBounds;
+			sampler2D _CameraDepthTexture;
 
 			fixed4 frag(v2f i) : SV_Target
 			{
 				fixed4 col = tex2D(_MainTex, i.uv);
 
-				float dtobox; //distance to the box
-				float dinbox; //distance inside the box
 				ray r;
 				r.origin = _WorldSpaceCameraPos;
 				r.direction = normalize(i.viewDir);
+
+				float dtobox; //distance to the box
+				float dinbox; //distance inside the box
+
+				//sampling depth texture
+				float depthSample = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
+				float depth = LinearEyeDepth(depthSample);
 				bool hit = AABBRayIntersection(r, _ContainerMinBounds, _ContainerMaxBounds, dtobox, dinbox);
 
-				if (hit)
-					col = dtobox;
+				if (hit && (((dtobox*i.viewDir).z -5) < depth))
+					col = 0;
 
 				return col;
             }
