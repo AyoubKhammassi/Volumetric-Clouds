@@ -99,7 +99,7 @@
 					tmax = tzmax;
 
 				dtobox = max(0, tmin);
-				dinbox = max(0, tmax - dtobox);
+				dinbox = max(0, tmax);
 				return true;
 			}
 
@@ -118,6 +118,7 @@
 			float3 _ContainerMaxBounds;
 			float3 _ContainerMinBounds;
 			sampler2D _CameraDepthTexture;
+			float _maxDepth;
 
 			fixed4 frag(v2f i) : SV_Target
 			{
@@ -132,11 +133,11 @@
 
 				//sampling depth texture
 				float depthSample = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
-				float depth = LinearEyeDepth(depthSample);
+				float depth = LinearEyeDepth(depthSample) * length(i.viewDir); //NOT BETWEEN  0 AND 1
 				bool hit = AABBRayIntersection(r, _ContainerMinBounds, _ContainerMaxBounds, dtobox, dinbox);
 
-				if (hit && (((dtobox*i.viewDir).z -5) < depth))
-					col = 0;
+				if (hit && dtobox - 0.3 <= depth)
+					col = float4(0, 0, 1.0, 1.0);
 
 				return col;
             }

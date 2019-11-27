@@ -38,6 +38,8 @@ public class TextureGenerator : MonoBehaviour
         //container position and localScale to determine its furthest/nearest point in each direction (x,y,z)
         mainMat.SetVector("_ContainerMaxBounds", container.position + container.localScale/2);
         mainMat.SetVector("_ContainerMinBounds", container.position - container.localScale/2);
+        float maxDepth = Camera.main.farClipPlane;
+        mainMat.SetFloat("_maxDepth", maxDepth);
         Graphics.Blit(source, destination, mainMat);
     }
 }
