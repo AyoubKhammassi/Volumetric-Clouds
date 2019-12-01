@@ -227,7 +227,7 @@ PrefabInstance:
     - target: {fileID: -927199367670048503, guid: 08004f115d63dc643be6636c12d4389c,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 08004f115d63dc643be6636c12d4389c,
         type: 3}
@@ -307,10 +307,40 @@ PrefabInstance:
     - target: {fileID: -1504981713932161579, guid: 08004f115d63dc643be6636c12d4389c,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08004f115d63dc643be6636c12d4389c, type: 3}
+--- !u!1 &544712690
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 544712692}
+  m_Layer: 0
+  m_Name: CubeMaptest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &544712692
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 544712690}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -7.7488403, y: -14.646576, z: -126.55051}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -323,6 +353,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
+  - component: {fileID: 963194230}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -402,13 +433,30 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14b8f031d6d3e404c90633eba0a92998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mainShader: {fileID: 4800000, guid: 57a6d4594e33e3e41b8080212f608f99, type: 3}
   container: {fileID: 1277217095}
+--- !u!114 &963194230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e22b1a77d1e7cbd47b7a820e2ec9f857, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cmpShader: {fileID: 7200000, guid: 5eb71f0ee5b7ac643a0e5ecf351068fb, type: 3}
+  slicer: {fileID: 4800000, guid: 840f1b9033715a149bd8024506a4252a, type: 3}
+  mat: {fileID: 2100000, guid: 4ff136aa606e8dd4a9746ece3e257c94, type: 2}
+  testing: 0
+  finalTex: {fileID: 0}
 --- !u!1 &1091004256
 GameObject:
   m_ObjectHideFlags: 0
