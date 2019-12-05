@@ -1,13 +1,51 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 
-sampler2D SpriteSheet;
-RWTexture3D<float4> Result;
+Texture2D<float4> spriteSheet;
+SamplerState sampler_spriteSheet;
+//Number of frames in X and Y components, sprite sheet resolution in Z and W
+float4 data;
+float depth;
+float depthStep;
+RWTexture3D<float4> result;
+
+//Index Conversion functions
+//converts an int index to a two dimensional index
+uint2 OneDtoTwoDIndex(uint2 XYFrames, uint index)
+{
+	uint y = index / XYFrames.x;
+	uint x = index % XYFrames.x;
+	return uint2(x, y);
+}
+
+//converts an int2 index to one dimensional index
+uint TwoDto1DIndex(uint2 XYFrames, uint2 index)
+{
+	return dot(index, XYFrames);
+}
+float2 uvw2uv(float3 uvw)
+{
+	uint nSprites = data.x * data.y - 2;
+	//float zStep = 1 / (nSprites);
+
+	float zSprites = uvw.z * nSprites;
+	//X and Y are the origin 
+	float y = zSprites / data.x;
+	float x = zSprites % data.y;
+
+	//normalized UVs
+	float2 nUVs = uvw.xy / (data.xy - 1);
+	return ((float2(x, y) / (data.xy - 1)) + nUVs);
+}
 
 [numthreads(1,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    
-    
-    Result[id] = float4(id.x, id.y, id.z, 1.0) / 1000.0;
+	float3 res = float3(data.zw / data.xy, depth);
+	float3 uvw = id.xyz / res;//this can be used to sample the sprite sheet
+
+	float2 uv = uvw2uv(uvw);
+	float2 nUVs = uvw.xy / data.xy;
+
+	result[id] = spriteSheet.SampleLevel(sampler_spriteSheet, uv, 0);
 }

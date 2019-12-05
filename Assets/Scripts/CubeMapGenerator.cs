@@ -8,6 +8,15 @@ public class CubeMapGenerator : MonoBehaviour
 {
     [Header("The used compute shader")]
     public ComputeShader cmpShader;
+    public Texture2D spriteSheet;
+
+    [Header("Number of sprites in each direction")]
+    public Vector2Int nSprites;
+
+    public int depthStep;
+    private int numberOfSprites;
+    private int depth;
+
     public Shader slicer;
     public Material mat;
     public bool testing = false;
@@ -15,7 +24,8 @@ public class CubeMapGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-     
+        numberOfSprites = nSprites.x * nSprites.y;
+        depth = (numberOfSprites-1) * depthStep;
     }
 
     // Update is called once per frame
@@ -36,9 +46,9 @@ public class CubeMapGenerator : MonoBehaviour
         desc.enableRandomWrite = true;
         desc.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.B8G8R8A8_UNorm;
         desc.msaaSamples = 1;
-        desc.height = Camera.main.pixelHeight;
-        desc.width = Camera.main.pixelWidth;
-        desc.volumeDepth = 512;
+        desc.height = spriteSheet.height / nSprites.y;
+        desc.width = spriteSheet.width / nSprites.x;
+        desc.volumeDepth = depth;
 
         finalTex = new RenderTexture(desc);
         finalTex.name = "test";
@@ -46,8 +56,16 @@ public class CubeMapGenerator : MonoBehaviour
 
         if (finalTex.IsCreated())
         {
-            cmpShader.SetTexture(0, "Result", finalTex);
-            cmpShader.Dispatch(0, desc.width,desc.height,512);
+            //setting shader properties
+            cmpShader.SetTexture(0, "result", finalTex);
+            cmpShader.SetTexture(0, "spriteSheet", spriteSheet);
+
+            cmpShader.SetFloat("depthStep", depthStep);
+            cmpShader.SetFloat("depth", depth);
+            cmpShader.SetVector("data", new Vector4(nSprites.x, nSprites.y, spriteSheet.width, spriteSheet.height));
+            cmpShader.Dispatch(0, desc.width, desc.height, depth);
+            //cmpShader.Dispatch(0, Camera.main.pixelWidth, Camera.main.pixelHeight, 512);
+
         }
     }
 
