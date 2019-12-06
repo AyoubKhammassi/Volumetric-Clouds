@@ -4,7 +4,7 @@
     {
         _MainTex ("Texture", 2D) = "white" {}
 		_Volumetex ("3D texture", 3D) = "white" {}
-		_Slice ("Slice", Range(0,1) ) = 1 
+		_Slice ("Slice", Range(0,1) ) = 0
 		//TODO: add wich dimension to fix
     }
     SubShader
@@ -48,7 +48,7 @@
             {
                 fixed4 col = tex3D(_VolumeTex, float3(i.uv, _Slice));
 
-				return float4(col.w,col.w, col.w, 1.0);
+				return float4(col.x,col.x, col.x, 1.0);
             }
             ENDCG
         }

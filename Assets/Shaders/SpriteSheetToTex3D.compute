@@ -1,34 +1,26 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 
+//Textures
 Texture2D<float4> spriteSheet;
+RWTexture3D<float4> result;
+//Sampler states
 SamplerState sampler_spriteSheet;
+
+//Metadata vars
 //Number of frames in X and Y components, sprite sheet resolution in Z and W
 float4 data;
 float depth;
 float depthStep;
-RWTexture3D<float4> result;
+uint numberOfSprites;
 
-//Index Conversion functions
-//converts an int index to a two dimensional index
-uint2 OneDtoTwoDIndex(uint2 XYFrames, uint index)
-{
-	uint y = index / XYFrames.x;
-	uint x = index % XYFrames.x;
-	return uint2(x, y);
-}
-
-//converts an int2 index to one dimensional index
-uint TwoDto1DIndex(uint2 XYFrames, uint2 index)
-{
-	return dot(index, XYFrames);
-}
+//Converts a 3 dimensional normalized indices uvw to 2 dimensional uv
 float2 uvw2uv(float3 uvw)
 {
-	uint nSprites =(uint)data.x * (uint)data.y;
-	//float zStep = 1 / (nSprites);
+	uint numberOfSprites =(uint)data.x * (uint)data.y;
+	//float zStep = 1 / (numberOfSprites);
 
-	uint zSprites = (uint)(uvw.z * nSprites);
+	uint zSprites = (uint)(uvw.z * numberOfSprites);
 	//X and Y are the origin 
 	uint y = zSprites / (uint)(data.x);
 	uint x = zSprites % (uint)(data.x);
@@ -38,7 +30,7 @@ float2 uvw2uv(float3 uvw)
 	return ((float2(x, y) / (data.xy)) + nUVs);
 }
 
-[numthreads(1,1,1)]
+[numthreads(8,8,8)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
 	float3 res = float3(data.zw / data.xy, depth);
@@ -49,5 +41,5 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
 	//the sprite sheet origin is on the top left, so we need to convert the UVs to that space
 	uv.y = abs(uv.y - 1.0);
-	result[id] = spriteSheet.SampleLevel(sampler_spriteSheet, uv, 0);
+	result[id] = spriteSheet.SampleLevel(sampler_spriteSheet, uv, 0).w;
 }
