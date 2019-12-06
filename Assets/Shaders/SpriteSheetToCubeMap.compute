@@ -25,17 +25,17 @@ uint TwoDto1DIndex(uint2 XYFrames, uint2 index)
 }
 float2 uvw2uv(float3 uvw)
 {
-	uint nSprites = data.x * data.y - 2;
+	uint nSprites =(uint)data.x * (uint)data.y;
 	//float zStep = 1 / (nSprites);
 
-	float zSprites = uvw.z * nSprites;
+	uint zSprites = (uint)(uvw.z * nSprites);
 	//X and Y are the origin 
-	float y = zSprites / data.x;
-	float x = zSprites % data.y;
+	uint y = zSprites / (uint)(data.x);
+	uint x = zSprites % (uint)(data.x);
 
 	//normalized UVs
-	float2 nUVs = uvw.xy / (data.xy - 1);
-	return ((float2(x, y) / (data.xy - 1)) + nUVs);
+	float2 nUVs = uvw.xy / (data.xy);
+	return ((float2(x, y) / (data.xy)) + nUVs);
 }
 
 [numthreads(1,1,1)]
@@ -47,5 +47,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	float2 uv = uvw2uv(uvw);
 	float2 nUVs = uvw.xy / data.xy;
 
+	//the sprite sheet origin is on the top left, so we need to convert the UVs to that space
+	uv.y = abs(uv.y - 1.0);
 	result[id] = spriteSheet.SampleLevel(sampler_spriteSheet, uv, 0);
 }

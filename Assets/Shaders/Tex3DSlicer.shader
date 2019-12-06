@@ -48,7 +48,7 @@
             {
                 fixed4 col = tex3D(_VolumeTex, float3(i.uv, _Slice));
 
-			return float4(col.w,col.w, col.w, 1.0);
+				return float4(col.w,col.w, col.w, 1.0);
             }
             ENDCG
         }

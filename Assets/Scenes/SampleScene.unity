@@ -455,7 +455,7 @@ MonoBehaviour:
   cmpShader: {fileID: 7200000, guid: 5eb71f0ee5b7ac643a0e5ecf351068fb, type: 3}
   spriteSheet: {fileID: 2800000, guid: 23ce934b2dae8cd4b8c795188af43ea7, type: 3}
   nSprites: {x: 7, y: 7}
-  depthStep: 10
+  depthStep: 20
   slicer: {fileID: 4800000, guid: 840f1b9033715a149bd8024506a4252a, type: 3}
   mat: {fileID: 2100000, guid: 4ff136aa606e8dd4a9746ece3e257c94, type: 2}
   testing: 0
