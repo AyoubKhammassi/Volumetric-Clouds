@@ -10,36 +10,64 @@ SamplerState sampler_spriteSheet;
 //Metadata vars
 //Number of frames in X and Y components, sprite sheet resolution in Z and W
 float4 data;
-float depth;
-float depthStep;
-uint numberOfSprites;
+int depth;
+int depthStep;
+int numberOfSprites;
 
 //Converts a 3 dimensional normalized indices uvw to 2 dimensional uv
-float2 uvw2uv(float3 uvw)
+float2 uvw2uv(float3 uvw, out float2 nextSprite)
 {
-	uint numberOfSprites =(uint)data.x * (uint)data.y;
+	uint numberOfSprites =((uint)data.x * (uint)data.y) - 1;
 	//float zStep = 1 / (numberOfSprites);
 
-	uint zSprites = (uint)(uvw.z * numberOfSprites);
+	uint zSprites = floor(uvw.z * numberOfSprites);
 	//X and Y are the origin 
 	uint y = zSprites / (uint)(data.x);
 	uint x = zSprites % (uint)(data.x);
 
 	//normalized UVs
 	float2 nUVs = uvw.xy / (data.xy);
-	return ((float2(x, y) / (data.xy)) + nUVs);
+	
+	float2 res = ((float2(x, y) / (data.xy)) + nUVs);
+	//finding the UVs in the next Sprite
+
+	zSprites++;
+	y = zSprites / (uint)(data.x);
+	x = zSprites % (uint)(data.x);
+
+	nextSprite = ((float2(x, y) / (data.xy)) + nUVs);
+	return res;
 }
 
-[numthreads(8,8,8)]
+[numthreads(1,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
 	float3 res = float3(data.zw / data.xy, depth);
 	float3 uvw = id.xyz / res;//this can be used to sample the sprite sheet
 
-	float2 uv = uvw2uv(uvw);
-	float2 nUVs = uvw.xy / data.xy;
+	float4 sampl1, sampl2;
+	float sampl;
+	float2 nextUV;
+	float2 uv = uvw2uv(uvw, nextUV);
+	
+	//Changing the UV space to the sprite sheet space
+	uv.y = 1.0 - uv.y;
+	nextUV.y = 1.0 - nextUV.y;
+	sampl1 = spriteSheet.SampleLevel(sampler_spriteSheet, uv, 0);
+	sampl2 = spriteSheet.SampleLevel(sampler_spriteSheet, nextUV, 0);
+
+	//getting the next sprite for interpolation
+	/*float normalizedStep = depthStep / depth;
+	uvw.z += normalizedStep;
+	uv = uvw2uv(uvw);
+
+	uv.y = 1.0 - uv.y;
+	sampl2 = spriteSheet.SampleLevel(sampler_spriteSheet, uv, 0);*/
+
+	float lerper = (((float)(id.z % depthStep)) / depthStep);
+	sampl = lerp(sampl1.w, sampl2.w, clamp(lerper, 0,1));
+
 
 	//the sprite sheet origin is on the top left, so we need to convert the UVs to that space
-	uv.y = abs(uv.y - 1.0);
-	result[id] = spriteSheet.SampleLevel(sampler_spriteSheet, uv, 0).w;
+	result[id] = sampl2.w;// spriteSheet.SampleLevel(sampler_spriteSheet, uv, 0).w;
 }

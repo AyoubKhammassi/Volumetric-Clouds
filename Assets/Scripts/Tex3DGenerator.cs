@@ -29,6 +29,12 @@ public class Tex3DGenerator : MonoBehaviour
             numberOfSprites = nSprites.x * nSprites.y;
 
         depth = (numberOfSprites - 1) * depthStep;
+        print("Total number of Sprites is " + numberOfSprites);
+        print("Depth is" + depth);
+
+        CreateTex3D();
+        mat = new Material(slicer);
+        testing = true;
     }
 
     // Update is called once per frame
@@ -50,7 +56,7 @@ public class Tex3DGenerator : MonoBehaviour
         desc.enableRandomWrite = true;
         //Finding the supported Graphics format
         desc.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm;
-        desc.msaaSamples = 4;
+        desc.msaaSamples = 8;  //NO MSAA
         desc.height = spriteSheet.height / nSprites.y;
         desc.width = spriteSheet.width / nSprites.x;
         desc.volumeDepth = depth;
@@ -59,20 +65,23 @@ public class Tex3DGenerator : MonoBehaviour
         finalTex.name = "test";
         finalTex.Create();
 
+        print("3D Render Texture is Created with the following dimensions: " + desc.height + "," + desc.width + "," + desc.volumeDepth);
+
         if (finalTex.IsCreated())
         {
             //setting shader properties
             cmpShader.SetTexture(0, "result", finalTex);
             cmpShader.SetTexture(0, "spriteSheet", spriteSheet);
 
-            cmpShader.SetFloat("depthStep", depthStep);
-            cmpShader.SetFloat("depth", depth);
+            cmpShader.SetInt("depthStep", depthStep);
+            cmpShader.SetInt("depth", depth);
             cmpShader.SetVector("data", new Vector4(nSprites.x, nSprites.y, spriteSheet.width, spriteSheet.height));
             cmpShader.SetInt("numberOfSprites", numberOfSprites);
 
             //Disoatch the compute shader with the specified number of thread groups in each dimension
-            Vector3Int threadGroups = new Vector3Int(desc.width / 8, desc.height / 8, depth / 8);
+            Vector3Int threadGroups = new Vector3Int(desc.width , desc.height, depth);
             cmpShader.Dispatch(0, threadGroups.x, threadGroups.y, threadGroups.z);
+            print("3D Render Texture is filled");
         }
 
         return finalTex;
