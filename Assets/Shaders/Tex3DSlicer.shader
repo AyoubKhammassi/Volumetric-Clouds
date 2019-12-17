@@ -47,7 +47,7 @@
             fixed4 frag (v2f i) : SV_Target
             {
 				i.uv.y = 1 - i.uv.y;
-                fixed4 col = tex3D(_VolumeTex, float3(i.uv, _Slice));
+                fixed4 col = tex3D(_VolumeTex, float3(i.uv, _Slice).zyx);
 
 				return float4(col.x,col.x, col.x, 1.0);
             }

@@ -15,12 +15,17 @@ int depthStep;
 int numberOfSprites;
 
 //Converts a 3 dimensional normalized indices uvw to 2 dimensional uv
-float2 uvw2uv(float3 uvw, out float2 nextSprite)
+float2 id2uv(uint3 id, out float2 nextSprite)
 {
 	uint numberOfSprites =((uint)data.x * (uint)data.y) - 1;
 	//float zStep = 1 / (numberOfSprites);
-
-	uint zSprites = floor(uvw.z * numberOfSprites);
+	
+	//Texture resolution in 3 directions
+	float3 resolution = float3(data.zw / data.xy, depth);
+	//this can be used to sample the sprite sheet
+    float3 uvw = id.xyz / resolution; 
+	
+    uint zSprites = (id.z / depthStep);
 	//X and Y are the origin 
 	uint y = zSprites / (uint)(data.x);
 	uint x = zSprites % (uint)(data.x);
@@ -42,13 +47,12 @@ float2 uvw2uv(float3 uvw, out float2 nextSprite)
 [numthreads(1,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-	float3 res = float3(data.zw / data.xy, depth);
-	float3 uvw = id.xyz / res;//this can be used to sample the sprite sheet
+	
 
 	float4 sampl1, sampl2;
 	float sampl;
 	float2 nextUV;
-	float2 uv = uvw2uv(uvw, nextUV);
+	float2 uv = id2uv(id, nextUV);
 	
 	//Changing the UV space to the sprite sheet space
 	uv.y = 1.0 - uv.y;
@@ -65,9 +69,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	sampl2 = spriteSheet.SampleLevel(sampler_spriteSheet, uv, 0);*/
 
 	float lerper = (((float)(id.z % depthStep)) / depthStep);
-	sampl = lerp(sampl1.w, sampl2.w, clamp(lerper, 0,1));
+	sampl = lerp(sampl1.w, sampl2.w, clamp(lerper, 0.0,1.0));
 
 
 	//the sprite sheet origin is on the top left, so we need to convert the UVs to that space
-	result[id] = sampl2.w;// spriteSheet.SampleLevel(sampler_spriteSheet, uv, 0).w;
+	result[id] = sampl;// spriteSheet.SampleLevel(sampler_spriteSheet, uv, 0).w;
 }
