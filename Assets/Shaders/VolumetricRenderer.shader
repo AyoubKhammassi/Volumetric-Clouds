@@ -36,6 +36,20 @@
 				float3 direction;
 			};
 
+			sampler2D _MainTex;
+			sampler2D _CameraDepthTexture;
+
+			//Handeled by the script
+			float3 _ContainerMaxBounds;
+			float3 _ContainerMinBounds;
+			float _maxDepth;
+
+			//Texture coming from the Tex3D Generator
+			Texture3D<float4> SSVolume;
+			SamplerState samplerSSVolume; //The sampler sate for the texture
+			float3 volumeOffset; //The volume offset inside the container; used when sampling density
+			float volumeScale; //the scale of the volume inside the container
+
 			/*float2 AABBRayIntersection(float3 bndMin, float3 bndMax, float3 origin, float3 direction)
 			{
 				float t0 = (bndMin - origin) / direction;
@@ -103,6 +117,15 @@
 				return true;
 			}
 
+			//Sample the density in the position pos inside the container
+			float4 sampleDensity(float3 pos)
+			{
+				float3 uvw = pos * volumeScale + volumeOffset;
+				float4 density = SSVolume.Sample(samplerSSVolume, uvw);
+				return density;
+
+			}
+
 
             v2f vert (appdata v)
             {
@@ -114,11 +137,7 @@
                 return o;
             }
 
-            sampler2D _MainTex;
-			float3 _ContainerMaxBounds;
-			float3 _ContainerMinBounds;
-			sampler2D _CameraDepthTexture;
-			float _maxDepth;
+
 
 			fixed4 frag(v2f i) : SV_Target
 			{
@@ -136,7 +155,7 @@
 				float depth = LinearEyeDepth(depthSample) * length(i.viewDir); //NOT BETWEEN  0 AND 1
 				bool hit = AABBRayIntersection(r, _ContainerMinBounds, _ContainerMaxBounds, dtobox, dinbox);
 
-				if (hit && dtobox - 0.3 <= depth)
+				if (hit && dtobox - _ProjectionParams.y <= depth)
 					col = float4(0, 0, 1.0, 1.0);
 
 				return col;
