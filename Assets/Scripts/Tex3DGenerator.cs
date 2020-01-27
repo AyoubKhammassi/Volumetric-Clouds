@@ -24,13 +24,13 @@ public struct SSToTex3DDesc
 public class Tex3DGenerator
 {
     private ComputeShader cmpShader;
-    const string cmpShaderName = "SpriteSheetToTex3D.compute";
+    const string cmpShaderName = "SpriteSheetToTex3D";
     public RenderTexture finalTex;
     private SSToTex3DDesc descriptor;
 
-    private void print(string text)
+    private void print(object text)
     {
-        System.Console.WriteLine(text);
+        MonoBehaviour.print(text);
     }
 
     public Tex3DGenerator(SSToTex3DDesc desc)
@@ -45,16 +45,17 @@ public class Tex3DGenerator
     {
         print("Setting the descriptor for the texture3D Generator");
         descriptor = desc;
-        finalTex.descriptor = desc.textureDesc;
+
         if (descriptor.maxNumberOfSprites <= 0)
             descriptor.maxNumberOfSprites = descriptor.nSprites.x * descriptor.nSprites.y;
     }
 
     public RenderTexture CreateTex3D()
     {
-
+        print("1");
         finalTex = new RenderTexture(descriptor.textureDesc);
         finalTex.name = "test";
+        finalTex.descriptor = descriptor.textureDesc;
         finalTex.Create();
 
         print("3D Render Texture is Created");

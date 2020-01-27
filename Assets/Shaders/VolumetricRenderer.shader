@@ -42,7 +42,6 @@
 			//Handeled by the script
 			float3 _ContainerMaxBounds;
 			float3 _ContainerMinBounds;
-			float _maxDepth;
 
 			//Texture coming from the Tex3D Generator
 			Texture3D<float4> SSVolume;
@@ -141,8 +140,10 @@
 
 			fixed4 frag(v2f i) : SV_Target
 			{
+				//Get the original rendered image
 				fixed4 col = tex2D(_MainTex, i.uv);
 
+				
 				ray r;
 				r.origin = _WorldSpaceCameraPos;
 				r.direction = normalize(i.viewDir);
@@ -155,8 +156,16 @@
 				float depth = LinearEyeDepth(depthSample) * length(i.viewDir); //NOT BETWEEN  0 AND 1
 				bool hit = AABBRayIntersection(r, _ContainerMinBounds, _ContainerMaxBounds, dtobox, dinbox);
 
-				if (hit && dtobox - _ProjectionParams.y <= depth)
-					col = float4(0, 0, 1.0, 1.0);
+				//Testing if the Container is in front of the Camera
+				hit = (hit && (dtobox > 0));
+				//Testing to see if the container is being culled by another object in the scene
+				hit = (hit && (dtobox - _ProjectionParams.y <= depth));
+
+				//_ProjectionParams is the camera near plane
+				if (hit)
+				{
+					col = float4(0, 0, dtobox, 1.0);
+				}
 
 				return col;
             }

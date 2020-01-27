@@ -287,7 +287,7 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: 08004f115d63dc643be6636c12d4389c,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 10000
+      value: 100000
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 08004f115d63dc643be6636c12d4389c,
         type: 3}
@@ -352,7 +352,7 @@ GameObject:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
-  - component: {fileID: 963194229}
+  - component: {fileID: 963194230}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -425,7 +425,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -1.74, z: 0}
---- !u!114 &963194229
+--- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -434,11 +434,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 963194225}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14b8f031d6d3e404c90633eba0a92998, type: 3}
+  m_Script: {fileID: 11500000, guid: a8b2439cbba18254ca0571eed2b46883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainShader: {fileID: 4800000, guid: 57a6d4594e33e3e41b8080212f608f99, type: 3}
+  ss2texDesc:
+    spriteSheet: {fileID: 2800000, guid: 23ce934b2dae8cd4b8c795188af43ea7, type: 3}
+    nSprites: {x: 7, y: 7}
+    depthStep: 30
+    maxNumberOfSprites: -1
+    depth: 0
   container: {fileID: 1277217095}
+  slicer: {fileID: 4800000, guid: 840f1b9033715a149bd8024506a4252a, type: 3}
+  slicingMat: {fileID: 0}
+  testing: 0
 --- !u!1 &1091004256
 GameObject:
   m_ObjectHideFlags: 0
