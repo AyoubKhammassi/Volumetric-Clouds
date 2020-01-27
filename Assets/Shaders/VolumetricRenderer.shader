@@ -155,7 +155,7 @@
 				float depth = LinearEyeDepth(depthSample) * length(i.viewDir); //NOT BETWEEN  0 AND 1
 				bool hit = AABBRayIntersection(r, _ContainerMinBounds, _ContainerMaxBounds, dtobox, dinbox);
 
-				if (!(hit && dtobox - _ProjectionParams.y <= depth))
+				if (hit && dtobox - _ProjectionParams.y <= depth)
 					col = float4(0, 0, 1.0, 1.0);
 
 				return col;
