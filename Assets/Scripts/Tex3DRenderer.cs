@@ -11,6 +11,9 @@ public class Tex3DRenderer : MonoBehaviour
     [Header("The transform for the Volume Container")]
     public Transform container;
 
+    [Header("Density Sampling Params")]
+    public float step = 0.1f;
+
     [Header("Testing configuration")]
     public Shader slicer;
     public Material slicingMat;
@@ -72,6 +75,9 @@ public class Tex3DRenderer : MonoBehaviour
             //container position and localScale to determine its furthest/nearest point in each direction (x,y,z)
             renderingMat.SetVector("_ContainerMaxBounds", container.position + container.localScale / 2);
             renderingMat.SetVector("_ContainerMinBounds", container.position - container.localScale / 2);
+            renderingMat.SetTexture("SSVolume", tex3D);
+            renderingMat.SetMatrix("_ContainerMatrix", container.worldToLocalMatrix);
+            renderingMat.SetFloat("_Step", step);
             Graphics.Blit(source, destination, renderingMat);
         }
     }

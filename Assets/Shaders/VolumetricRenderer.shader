@@ -3,6 +3,8 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+		_VolumeOffset("Volume Offse", Vector) =(0,0,0)
+		_VolumeScale("Volume Scale", float) = 1.0
     }
     SubShader
     {
@@ -40,14 +42,21 @@
 			sampler2D _CameraDepthTexture;
 
 			//Handeled by the script
+			//Container metadata
 			float3 _ContainerMaxBounds;
 			float3 _ContainerMinBounds;
+			//The world to object matrix of the  container
+			float4x4 _ContainerMatrix;
 
 			//Texture coming from the Tex3D Generator
 			Texture3D<float4> SSVolume;
 			SamplerState samplerSSVolume; //The sampler sate for the texture
-			float3 volumeOffset; //The volume offset inside the container; used when sampling density
-			float volumeScale; //the scale of the volume inside the container
+			float3 _VolumeOffset; //The volume offset inside the container; used when sampling density
+			float _VolumeScale; //the scale of the volume inside the container
+
+			//Sampling
+			//The step between each point of sampling inside the container, the smaller the step the more samples
+			float _Step;
 
 			/*float2 AABBRayIntersection(float3 bndMin, float3 bndMax, float3 origin, float3 direction)
 			{
@@ -119,10 +128,10 @@
 			//Sample the density in the position pos inside the container
 			float4 sampleDensity(float3 pos)
 			{
-				float3 uvw = pos * volumeScale + volumeOffset;
+				//the pos origin is the center of the container
+				float3 uvw = pos + float3(0.5,0.5,0.5);// *volumeScale + volumeOffset;
 				float4 density = SSVolume.Sample(samplerSSVolume, uvw);
 				return density;
-
 			}
 
 
@@ -157,14 +166,33 @@
 				bool hit = AABBRayIntersection(r, _ContainerMinBounds, _ContainerMaxBounds, dtobox, dinbox);
 
 				//Testing if the Container is in front of the Camera
-				hit = (hit && (dtobox > 0));
+				hit = (hit && (dinbox > 0));
 				//Testing to see if the container is being culled by another object in the scene
 				hit = (hit && (dtobox - _ProjectionParams.y <= depth));
+
 
 				//_ProjectionParams is the camera near plane
 				if (hit)
 				{
-					col = float4(0, 0, dtobox, 1.0);
+					float4 worldPos = float4(r.origin + r.direction * dtobox, 1.0);
+					float3 pos = mul(_ContainerMatrix, worldPos).xyz;
+					pos = normalize(pos);
+
+					fixed density = 0.0;
+					fixed dist = 0.0;
+					[unroll(5)]
+					while (dist < dinbox)
+					{
+						//we need to find the position of the hit point in the local space of the container
+
+						density += sampleDensity(pos).x;
+						//Advance one step in the ray direction inside the container
+						dist += _Step;
+						pos += r.direction * _Step;
+					}
+
+					float3 mixedCol = float3(1.0, 1.0, 1.0) * density + col.xyz * (1 - density);
+					col = float4(mixedCol, 1.0);
 				}
 
 				return col;
