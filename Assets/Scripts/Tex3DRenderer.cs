@@ -14,6 +14,11 @@ public class Tex3DRenderer : MonoBehaviour
     [Header("Density Sampling Params")]
     public float step = 0.1f;
 
+    [Header("Volume Properties")]
+    public Vector3 volumeOffset = new Vector3(0, 0, 0);
+    public float volumeScale = 1.0f;
+    public float density;
+
     [Header("Testing configuration")]
     public Shader slicer;
     public Material slicingMat;
@@ -78,6 +83,8 @@ public class Tex3DRenderer : MonoBehaviour
             renderingMat.SetTexture("SSVolume", tex3D);
             renderingMat.SetMatrix("_ContainerMatrix", container.worldToLocalMatrix);
             renderingMat.SetFloat("_Step", step);
+            renderingMat.SetFloat("_VolumeScale", volumeScale);
+            renderingMat.SetFloat("_Density", density);
             Graphics.Blit(source, destination, renderingMat);
         }
     }

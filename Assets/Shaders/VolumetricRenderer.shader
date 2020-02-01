@@ -53,7 +53,7 @@
 			SamplerState samplerSSVolume; //The sampler sate for the texture
 			float3 _VolumeOffset; //The volume offset inside the container; used when sampling density
 			float _VolumeScale; //the scale of the volume inside the container
-
+			float _Density;
 			//Sampling
 			//The step between each point of sampling inside the container, the smaller the step the more samples
 			float _Step;
@@ -129,8 +129,32 @@
 			float4 sampleDensity(float3 pos)
 			{
 				//the pos origin is the center of the container
-				float3 uvw = pos + float3(0.5,0.5,0.5);// *volumeScale + volumeOffset;
+				float3 uvw = pos * _VolumeScale + _VolumeOffset;
+				uvw += +float3(0.5, 0.5, 0.5);
 				float4 density = SSVolume.Sample(samplerSSVolume, uvw);
+				return density;
+			}
+
+			float lightQuantity(float3 pos)
+			{
+				ray r;
+				//the current position we're sampling
+				r.origin = pos;
+				//the direction to the light source
+				r.direction = normalize(_WorldSpaceLightPos0.xyz - pos);
+
+				float dinbox, dtobox, density;
+				//we know for sure that we're inside the container, we're only interested in the dinbox value
+				bool hit = AABBRayIntersection(r, _ContainerMinBounds, _ContainerMaxBounds, dtobox, dinbox);
+
+				density = 0;
+				[unroll(5)]
+				while (dinbox > 0.0)
+				{
+					pos += r.direction * _Step;
+					density += sampleDensity(pos).x;
+					dinbox -= _Step;
+				}
 				return density;
 			}
 
@@ -178,6 +202,9 @@
 					float3 pos = mul(_ContainerMatrix, worldPos).xyz;
 					pos = normalize(pos);
 
+					//If there's an object inside the volume, the depth is as far as we march
+					dinbox = min((dinbox - _ProjectionParams.y), depth);
+
 					fixed density = 0.0;
 					fixed dist = 0.0;
 					[unroll(5)]
@@ -185,13 +212,16 @@
 					{
 						//we need to find the position of the hit point in the local space of the container
 
-						density += sampleDensity(pos).x;
+						density += sampleDensity(pos).x * _Step;
 						//Advance one step in the ray direction inside the container
 						dist += _Step;
 						pos += r.direction * _Step;
+
+						
 					}
 
-					float3 mixedCol = float3(1.0, 1.0, 1.0) * density + col.xyz * (1 - density);
+					density = exp(-(density*_Density));
+					float3 mixedCol = float3(1.0, 1.0, 1.0) * (1 - density) + col.xyz * density;
 					col = float4(mixedCol, 1.0);
 				}
 
