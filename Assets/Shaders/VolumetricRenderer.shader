@@ -51,9 +51,12 @@
 			//Texture coming from the Tex3D Generator
 			Texture3D<float4> SSVolume;
 			SamplerState samplerSSVolume; //The sampler sate for the texture
+			SamplerState trilinear_repeat_samplerSSVolume;
 			float3 _VolumeOffset; //The volume offset inside the container; used when sampling density
 			float _VolumeScale; //the scale of the volume inside the container
+			float3 _VolumeColor;
 			float _Density;
+			float _MinDensity;
 			//Sampling
 			//The step between each point of sampling inside the container, the smaller the step the more samples
 			float _Step;
@@ -129,8 +132,16 @@
 			float4 sampleDensity(float3 pos)
 			{
 				//the pos origin is the center of the container
-				float3 uvw = pos * _VolumeScale + _VolumeOffset;
+				float3 uvw = pos / _VolumeScale + _VolumeOffset;
 				uvw += +float3(0.5, 0.5, 0.5);
+
+
+				clamp(uvw, float3(0, 0, 0), float3(1, 1, 1));
+
+				if (uvw.x < 0.0 || uvw.y < 0.0 || uvw.z < 0.0)
+					return float4(0, 0, 0, 0);
+				if (uvw.x > 1.0 || uvw.y > 1.0 || uvw.z > 1.0)
+					return float4(0, 0, 0, 0);
 				float4 density = SSVolume.Sample(samplerSSVolume, uvw);
 				return density;
 			}
@@ -204,24 +215,23 @@
 
 					//If there's an object inside the volume, the depth is as far as we march
 					dinbox = min((dinbox - _ProjectionParams.y), depth);
-
-					fixed density = 0.0;
-					fixed dist = 0.0;
-					[unroll(5)]
+					fixed accumDensity = 0.0;
+					fixed dist = 0;
+					[unroll(30)]
 					while (dist < dinbox)
 					{
 						//we need to find the position of the hit point in the local space of the container
 
-						density += sampleDensity(pos).x * _Step;
+						accumDensity += sampleDensity(pos).x * _Step;
 						//Advance one step in the ray direction inside the container
 						dist += _Step;
 						pos += r.direction * _Step;
-
-						
 					}
 
-					density = exp(-(density*_Density));
-					float3 mixedCol = float3(1.0, 1.0, 1.0) * (1 - density) + col.xyz * density;
+					accumDensity = max(_MinDensity, accumDensity);
+
+					accumDensity = exp(-(accumDensity*_Density));
+					float3 mixedCol = _VolumeColor * (1 - accumDensity) + col.xyz * accumDensity;
 					col = float4(mixedCol, 1.0);
 				}
 

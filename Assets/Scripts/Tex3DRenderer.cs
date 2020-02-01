@@ -12,12 +12,16 @@ public class Tex3DRenderer : MonoBehaviour
     public Transform container;
 
     [Header("Density Sampling Params")]
+    [Range(0.0001f,0.1f)]
     public float step = 0.1f;
 
     [Header("Volume Properties")]
     public Vector3 volumeOffset = new Vector3(0, 0, 0);
     public float volumeScale = 1.0f;
+    [Range(0.0f, 100.0f)]
     public float density;
+    public Color volumeColor;
+    public float minDensity;
 
     [Header("Testing configuration")]
     public Shader slicer;
@@ -50,6 +54,8 @@ public class Tex3DRenderer : MonoBehaviour
         //Creating the 3D texture
         tex3DGenerator = new Tex3DGenerator(ss2texDesc);
         tex3D = tex3DGenerator.CreateTex3D();
+        tex3D.wrapMode = TextureWrapMode.Clamp;
+        tex3D.filterMode = FilterMode.Trilinear;
 
         //Loading the rendering shader and creating the rendering material
         renderingShader = Shader.Find("Custom/VolumetricRenderer");
@@ -84,7 +90,11 @@ public class Tex3DRenderer : MonoBehaviour
             renderingMat.SetMatrix("_ContainerMatrix", container.worldToLocalMatrix);
             renderingMat.SetFloat("_Step", step);
             renderingMat.SetFloat("_VolumeScale", volumeScale);
+            renderingMat.SetVector("_VolumeOffset", volumeOffset);
+            renderingMat.SetColor("_VolumeColor", volumeColor);
             renderingMat.SetFloat("_Density", density);
+            renderingMat.SetFloat("_MinDensity", minDensity);
+
             Graphics.Blit(source, destination, renderingMat);
         }
     }
