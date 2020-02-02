@@ -18,6 +18,7 @@
             #pragma fragment frag
 
             #include "UnityCG.cginc"
+			#include "UnityLightingCommon.cginc"
 
             struct appdata
             {
@@ -138,10 +139,10 @@
 
 				clamp(uvw, float3(0, 0, 0), float3(1, 1, 1));
 
-				if (uvw.x < 0.0 || uvw.y < 0.0 || uvw.z < 0.0)
+				/*if (uvw.x < 0.0 || uvw.y < 0.0 || uvw.z < 0.0)
 					return float4(0, 0, 0, 0);
 				if (uvw.x > 1.0 || uvw.y > 1.0 || uvw.z > 1.0)
-					return float4(0, 0, 0, 0);
+					return float4(0, 0, 0, 0);*/
 				float4 density = SSVolume.Sample(samplerSSVolume, uvw);
 				return density;
 			}
@@ -159,13 +160,14 @@
 				bool hit = AABBRayIntersection(r, _ContainerMinBounds, _ContainerMaxBounds, dtobox, dinbox);
 
 				density = 0;
-				[unroll(5)]
+				[unroll(30)]
 				while (dinbox > 0.0)
 				{
 					pos += r.direction * _Step;
-					density += sampleDensity(pos).x;
+					density += sampleDensity(pos).x * _Step;
 					dinbox -= _Step;
 				}
+				density = exp(-density * _Density);
 				return density;
 			}
 
@@ -179,7 +181,6 @@
 				o.viewDir = mul(unity_CameraToWorld, float4(viewVector, 0));
                 return o;
             }
-
 
 
 			fixed4 frag(v2f i) : SV_Target
@@ -210,28 +211,32 @@
 				if (hit)
 				{
 					float4 worldPos = float4(r.origin + r.direction * dtobox, 1.0);
+					//we need to find the position of the hit point in the local space of the container
 					float3 pos = mul(_ContainerMatrix, worldPos).xyz;
 					pos = normalize(pos);
 
 					//If there's an object inside the volume, the depth is as far as we march
 					dinbox = min((dinbox - _ProjectionParams.y), depth);
 					fixed accumDensity = 0.0;
+					fixed light = 0;
 					fixed dist = 0;
 					[unroll(30)]
 					while (dist < dinbox)
 					{
-						//we need to find the position of the hit point in the local space of the container
 
+						light += lightQuantity(pos) * _Step * _Density * accumDensity;
 						accumDensity += sampleDensity(pos).x * _Step;
 						//Advance one step in the ray direction inside the container
 						dist += _Step;
 						pos += r.direction * _Step;
 					}
 
-					accumDensity = max(_MinDensity, accumDensity);
+
 
 					accumDensity = exp(-(accumDensity*_Density));
-					float3 mixedCol = _VolumeColor * (1 - accumDensity) + col.xyz * accumDensity;
+					float opacity = 1 - accumDensity;
+					float3 cloudCol = light * _LightColor0 * _VolumeColor;
+					float3 mixedCol = col.xyz * accumDensity + cloudCol; //_VolumeColor * opacity + col.xyz * (1 - opacity);
 					col = float4(mixedCol, 1.0);
 				}
 

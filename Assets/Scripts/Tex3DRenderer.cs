@@ -54,7 +54,7 @@ public class Tex3DRenderer : MonoBehaviour
         //Creating the 3D texture
         tex3DGenerator = new Tex3DGenerator(ss2texDesc);
         tex3D = tex3DGenerator.CreateTex3D();
-        tex3D.wrapMode = TextureWrapMode.Clamp;
+        tex3D.wrapMode = TextureWrapMode.Repeat;
         tex3D.filterMode = FilterMode.Trilinear;
 
         //Loading the rendering shader and creating the rendering material
