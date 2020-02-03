@@ -46,13 +46,11 @@ public class Tex3DGenerator
         print("Setting the descriptor for the texture3D Generator");
         descriptor = desc;
 
-        if (descriptor.maxNumberOfSprites <= 0)
-            descriptor.maxNumberOfSprites = descriptor.nSprites.x * descriptor.nSprites.y;
+
     }
 
     public RenderTexture CreateTex3D()
     {
-        print("1");
         finalTex = new RenderTexture(descriptor.textureDesc);
         finalTex.name = "test";
         finalTex.descriptor = descriptor.textureDesc;
@@ -70,7 +68,7 @@ public class Tex3DGenerator
             cmpShader.SetInt("depth", descriptor.depth);
             cmpShader.SetVector("data", new Vector4(descriptor.nSprites.x, descriptor.nSprites.y, descriptor.spriteSheet.width, descriptor.spriteSheet.height));
             cmpShader.SetInt("numberOfSprites", descriptor.maxNumberOfSprites);
-
+            print(descriptor.maxNumberOfSprites);
             //Disoatch the compute shader with the specified number of thread groups in each dimension
             Vector3Int threadGroups = new Vector3Int(descriptor.textureDesc.width , descriptor.textureDesc.height, descriptor.depth);
             cmpShader.Dispatch(0, threadGroups.x, threadGroups.y, threadGroups.z);

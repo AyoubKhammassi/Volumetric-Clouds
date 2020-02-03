@@ -573,7 +573,7 @@ MonoBehaviour:
     spriteSheet: {fileID: 2800000, guid: 23ce934b2dae8cd4b8c795188af43ea7, type: 3}
     nSprites: {x: 7, y: 7}
     depthStep: 5
-    maxNumberOfSprites: -1
+    maxNumberOfSprites: 46
     depth: 245
   container: {fileID: 1277217095}
   step: 0.03
@@ -584,7 +584,7 @@ MonoBehaviour:
   minDensity: 0
   slicer: {fileID: 4800000, guid: 840f1b9033715a149bd8024506a4252a, type: 3}
   slicingMat: {fileID: 0}
-  testing: 0
+  testing: 1
 --- !u!1 &1277217091
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,7 +658,7 @@ Transform:
   m_GameObject: {fileID: 1277217091}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 400, y: 400, z: 400}
+  m_LocalScale: {x: 500, y: 500, z: 500}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2

@@ -46,8 +46,11 @@ public class Tex3DRenderer : MonoBehaviour
         desc.msaaSamples = 1;  //NO MSAA
         desc.height = ss2texDesc.spriteSheet.height / ss2texDesc.nSprites.y;
         desc.width = ss2texDesc.spriteSheet.width / ss2texDesc.nSprites.x;
+        //max number of sprites
+        if (ss2texDesc.maxNumberOfSprites <= 0)
+            ss2texDesc.maxNumberOfSprites = ss2texDesc.nSprites.x * ss2texDesc.nSprites.y;
         //Calculating Depth
-        ss2texDesc.depth = ss2texDesc.nSprites.x * ss2texDesc.nSprites.y * ss2texDesc.depthStep;
+        ss2texDesc.depth = ss2texDesc.maxNumberOfSprites * ss2texDesc.depthStep;
         desc.volumeDepth = ss2texDesc.depth;
         ss2texDesc.textureDesc = desc;
 

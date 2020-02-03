@@ -17,7 +17,7 @@ int numberOfSprites;
 //Converts a 3 dimensional normalized indices uvw to 2 dimensional uv
 float2 id2uv(uint3 id, out float2 nextSprite)
 {
-	uint numberOfSprites =((uint)data.x * (uint)data.y) - 1;
+	//uint numberOfSprites =((uint)data.x * (uint)data.y) - 1;
 	//float zStep = 1 / (numberOfSprites);
 	
 	//Texture resolution in 3 directions
@@ -34,13 +34,13 @@ float2 id2uv(uint3 id, out float2 nextSprite)
 	float2 nUVs = uvw.xy / (data.xy);
 	
 	float2 res = ((float2(x, y) / (data.xy)) + nUVs);
+	
 	//finding the UVs in the next Sprite
-
 	zSprites++;
-	y = zSprites / (uint)(data.x);
-	x = zSprites % (uint)(data.x);
+    y = zSprites / (uint) (data.x);
+    x = zSprites % (uint) (data.x);
+    nextSprite = ((float2(x, y) / (data.xy)) + nUVs);
 
-	nextSprite = ((float2(x, y) / (data.xy)) + nUVs);
 	return res;
 }
 
