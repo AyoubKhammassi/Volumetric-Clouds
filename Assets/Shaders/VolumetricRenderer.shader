@@ -137,7 +137,7 @@
 				uvw += +float3(0.5, 0.5, 0.5);
 
 
-				clamp(uvw, float3(0, 0, 0), float3(1, 1, 1));
+				//clamp(uvw, float3(0, 0, 0), float3(1, 1, 1));
 
 				/*if (uvw.x < 0.0 || uvw.y < 0.0 || uvw.z < 0.0)
 					return float4(0, 0, 0, 0);
@@ -153,22 +153,22 @@
 				//the current position we're sampling
 				r.origin = pos;
 				//the direction to the light source
-				r.direction = normalize(_WorldSpaceLightPos0.xyz - pos);
+				r.direction = normalize(_WorldSpaceLightPos0.xyz);
 
 				float dinbox, dtobox, density;
 				//we know for sure that we're inside the container, we're only interested in the dinbox value
 				bool hit = AABBRayIntersection(r, _ContainerMinBounds, _ContainerMaxBounds, dtobox, dinbox);
-
+				dinbox = (dinbox - dtobox);
 				density = 0;
-				[unroll(30)]
+				[unroll(10)]
 				while (dinbox > 0.0)
 				{
 					pos += r.direction * _Step;
 					density += sampleDensity(pos).x * _Step;
 					dinbox -= _Step;
 				}
-				density = exp(-density * _Density);
-				return density;
+				float transmittance = exp(-density * _Density);
+				return transmittance;
 			}
 
 
@@ -217,10 +217,11 @@
 
 					//If there's an object inside the volume, the depth is as far as we march
 					dinbox = min((dinbox - _ProjectionParams.y), depth);
+					dinbox = (dinbox - dtobox);
 					fixed accumDensity = 0.0;
 					fixed light = 0;
 					fixed dist = 0;
-					[unroll(30)]
+					[unroll(50)]
 					while (dist < dinbox)
 					{
 
@@ -231,12 +232,13 @@
 						pos += r.direction * _Step;
 					}
 
+					/*if (dist < dinbox)
+						return (dinbox - dtobox);*/
 
-
-					accumDensity = exp(-(accumDensity*_Density));
+					float transmittance = exp(-(accumDensity*_Density));
 					float opacity = 1 - accumDensity;
 					float3 cloudCol = light * _LightColor0 * _VolumeColor;
-					float3 mixedCol = col.xyz * accumDensity + cloudCol; //_VolumeColor * opacity + col.xyz * (1 - opacity);
+					float3 mixedCol = col.xyz * transmittance + cloudCol; //_VolumeColor * opacity + col.xyz * (1 - opacity);
 					col = float4(mixedCol, 1.0);
 				}
 

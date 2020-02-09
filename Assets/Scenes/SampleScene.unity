@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 1
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: bad14deb9b1837045b83e4a35b420961, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 1a0d78e1505433d4a90d799db60ae658, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -425,13 +425,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 791765282}
-  m_LocalRotation: {x: 0.5028936, y: -0.15111713, z: 0.07413906, w: 0.84780014}
-  m_LocalPosition: {x: 0, y: 447.637, z: -193}
+  m_LocalRotation: {x: 0.9885373, y: -0, z: -0, w: 0.15097703}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 61.058002, y: -22.049002, z: -3.1130002}
+  m_LocalEulerAnglesHint: {x: 162.633, y: -0.000015258789, z: -0.000015258789}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -511,7 +511,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -909}
+  m_LocalPosition: {x: 0, y: 0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -529,34 +529,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d99d440aa1c856d43bc8e71c33db4a4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boost: 3.5
-  positionLerpTime: 0.2
-  mouseSensitivityCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.5
-      inSlope: 0
-      outSlope: 5
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 2.5
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  rotationLerpTime: 0.01
-  invertY: 0
+  translationSensitivity: 0.5
+  zoomSensitiviy: 5
+  rotationSensitiviry: 2
+  mouseHorizontalAxisName: Mouse X
+  mouseVerticalAxisName: Mouse Y
+  scrollAxisName: Mouse ScrollWheel
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -572,11 +550,11 @@ MonoBehaviour:
   ss2texDesc:
     spriteSheet: {fileID: 2800000, guid: 23ce934b2dae8cd4b8c795188af43ea7, type: 3}
     nSprites: {x: 7, y: 7}
-    depthStep: 5
+    depthStep: 3
     maxNumberOfSprites: 46
     depth: 245
   container: {fileID: 1277217095}
-  step: 0.03
+  step: 0.02
   volumeOffset: {x: 0, y: 0, z: 0}
   volumeScale: 1.5
   density: 10
@@ -584,7 +562,7 @@ MonoBehaviour:
   minDensity: 0
   slicer: {fileID: 4800000, guid: 840f1b9033715a149bd8024506a4252a, type: 3}
   slicingMat: {fileID: 0}
-  testing: 1
+  testing: 0
 --- !u!1 &1277217091
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,7 +636,7 @@ Transform:
   m_GameObject: {fileID: 1277217091}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 500, y: 500, z: 500}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
